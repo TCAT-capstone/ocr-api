@@ -2,6 +2,7 @@ from flask import Flask,jsonify,request
 
 import easyocr
 from difflib import get_close_matches
+import datetime
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -16,7 +17,8 @@ def ticketreader():
 "샤롯데씨어터",
 "LG아트센터",
 "블루스퀘어 신한카드홀",
-"블루스퀘어 인터파크홀"
+"블루스퀘어 인터파크홀",
+"블루스퀘어 아이마켓홀 (구 삼성카드홀)",
 "충무아트센터",
 "대성 디큐브아트센터",
 "국립극장 해오름",
@@ -41,7 +43,10 @@ def ticketreader():
 "두산아트센터 연강홀",
 "홍익대 대학로 아트센터",
 "세종문화회관 M씨어터",
-"아트원 씨어터", "TOM", "유니플렉스"]
+"아트원 씨어터", "TOM", "유니플렉스",
+"악스 코리아","경희대 평화의 전당","올림픽핸드볼경기장",
+"코엑스 컨벤션홀 Hall D","잠실실내체육관","올림픽체조경기장",
+"고척스카이돔","잠실올림픽보조경기장","상암월드컵경기장","잠실올림픽주경기장"]
     date=""
     location=""
     seat=""
@@ -53,8 +58,12 @@ def ticketreader():
             location+=" ".join(t)
         if "층" in i or "열" in i or "번" in i and "번호" not in i:
             seat+=i
-    return jsonify(ticketDate=date,ticketLocation=location,ticetSeat=seat)
+    date=date.replace('일 시:','')
+    date=date.replace(' ','')
+    dateformat=datetime.datetime.strptime(date,'%Y년%m월%d일').strftime('%Y-%m-%d')
+    
+    return jsonify(ticketDate=dateformat,ticketLocation=location,ticetSeat=seat)
 
 if __name__=='__main__':
     app.run(debug=False,host="127.0.0.1",port=5000)
-# date,location,seat=ticketreader('https://github.com/TCAT-capstone/run-easyocr/blob/main/src/data5.jpg?raw=true')
+
