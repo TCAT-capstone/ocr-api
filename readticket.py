@@ -1,18 +1,22 @@
 from flask import Flask,jsonify,request
-
+from werkzeug.utils import secure_filename
 import easyocr
 from difflib import get_close_matches
 import datetime
+import os
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-@app.route("/ticketinfo",methods=['POST'])
+@app.route("/ocr",methods=['POST'])
 def ticketreader():
     n=4
     cutoff=0.7
-    data=request.get_json()
-    reader = easyocr.Reader(['ko','en'], gpu = True)
-    result = reader.readtext(data['ticketImg'], detail = 0)
+    f=request.files['file']
+    f.save(secure_filename(f.filename))
+    path=secure_filename(f.filename)
+    reader = easyocr.Reader(['ko','en'], gpu = False)
+    result = reader.readtext(str(path),detail=0)
+    os.remove(str(path))
     theather=["세종문화회관","예술의전당 오페라극장","예술의전당 CJ 토월극장",
 "샤롯데씨어터",
 "LG아트센터",
@@ -61,7 +65,6 @@ def ticketreader():
     date=date.replace('일 시:','')
     date=date.replace(' ','')
     dateformat=datetime.datetime.strptime(date,'%Y년%m월%d일').strftime('%Y-%m-%d')
-    
     return jsonify(ticketDate=dateformat,ticketLocation=location,ticetSeat=seat)
 
 if __name__=='__main__':
