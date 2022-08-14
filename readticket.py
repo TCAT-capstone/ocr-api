@@ -1,12 +1,20 @@
 from flask import Flask,jsonify,request
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import easyocr
 from difflib import get_close_matches
 import datetime
 import os
+from dotenv import dotenv_values
+
+config = dotenv_values(".env")
+FRONT_URL = config['FRONT_URL']
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+
+CORS(app, resources={r'*': {'origins': FRONT_URL}})
+
 @app.route("/ocr",methods=['POST'])
 def ticketreader():
     n=4
